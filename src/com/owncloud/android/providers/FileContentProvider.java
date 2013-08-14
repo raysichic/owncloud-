@@ -90,7 +90,7 @@ public class FileContentProvider extends ContentProvider {
     private static final UriMatcher mUriMatcher;
     static {
         mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        mUriMatcher.addURI(ProviderMeta.AUTHORITY_FILES, "/", ROOT_DIRECTORY);
+        mUriMatcher.addURI(ProviderMeta.AUTHORITY_FILES, null, ROOT_DIRECTORY);
         mUriMatcher.addURI(ProviderMeta.AUTHORITY_FILES, "file/", SINGLE_FILE);
         mUriMatcher.addURI(ProviderMeta.AUTHORITY_FILES, "file/#", SINGLE_FILE);
         mUriMatcher.addURI(ProviderMeta.AUTHORITY_FILES, "dir/#", DIRECTORY);
