@@ -76,8 +76,6 @@ import com.owncloud.android.ui.NavigationDrawerItem;
 import com.owncloud.android.ui.adapter.NavigationDrawerListAdapter;
 import com.owncloud.android.ui.dialog.LoadingDialog;
 import com.owncloud.android.ui.dialog.SharePasswordDialogFragment;
-import com.owncloud.android.ui.fragment.FileDetailFragment;
-import com.owncloud.android.ui.fragment.FileFragment;
 import com.owncloud.android.utils.ErrorMessageAdapter;
 
 import java.util.ArrayList;
@@ -181,8 +179,7 @@ public abstract class FileActivity extends BaseActionBarActivity
             mFileOperationsHelper.setOpIdWaitingFor(
                     savedInstanceState.getLong(KEY_WAITING_FOR_OP_ID, Long.MAX_VALUE)
                     );
-            mTryShareAgain = savedInstanceState.getBoolean(KEY_TRY_SHARE_AGAIN);
-            getSupportActionBar().setTitle(savedInstanceState.getString(KEY_ACTION_BAR_TITLE));
+            mTryShareAgain = savedInstanceState.getBoolean(KEY_TRY_SHARE_AGAIN);            
         } else {
             account = getIntent().getParcelableExtra(FileActivity.EXTRA_ACCOUNT);
             mFile = getIntent().getParcelableExtra(FileActivity.EXTRA_FILE);
@@ -288,6 +285,11 @@ public abstract class FileActivity extends BaseActionBarActivity
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        
+        if(savedInstanceState != null) {            
+            getSupportActionBar().setTitle(savedInstanceState.getString(KEY_ACTION_BAR_TITLE));
+        }
+        
         // Sync the toggle state after onRestoreInstanceState has occurred.
         if (mDrawerToggle != null) {
             mDrawerToggle.syncState();
