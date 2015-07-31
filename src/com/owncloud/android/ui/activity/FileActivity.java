@@ -43,6 +43,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -402,6 +403,14 @@ public abstract class FileActivity extends BaseActionBarActivity
             }
         };
 
+        mDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("IT WORKS :)", "");
+                onBackPressed();
+            }
+        });
+
         //mDrawerToggle.setDrawerIndicatorEnabled(true);
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -444,9 +453,8 @@ public abstract class FileActivity extends BaseActionBarActivity
 
         /// set home button properties
         mDrawerToggle.setDrawerIndicatorEnabled(inRoot);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(!inRoot);
         actionBar.setDisplayShowTitleEnabled(true);
-
     }
 
 
