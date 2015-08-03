@@ -452,8 +452,15 @@ public abstract class FileActivity extends BaseActionBarActivity
         }
 
         /// set home button properties
-        mDrawerToggle.setDrawerIndicatorEnabled(inRoot);
-        actionBar.setDisplayHomeAsUpEnabled(!inRoot);
+        boolean enabled = mDrawerToggle.isDrawerIndicatorEnabled();
+        if(inRoot) {
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        if(!inRoot) {
+            mDrawerToggle.setDrawerIndicatorEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         actionBar.setDisplayShowTitleEnabled(true);
     }
 
