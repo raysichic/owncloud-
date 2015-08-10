@@ -57,6 +57,7 @@ import com.owncloud.android.media.MediaControlView;
 import com.owncloud.android.media.MediaService;
 import com.owncloud.android.media.MediaServiceBinder;
 import com.owncloud.android.ui.activity.FileActivity;
+import com.owncloud.android.ui.activity.FileDisplayActivity;
 import com.owncloud.android.ui.dialog.ConfirmationDialogFragment;
 import com.owncloud.android.ui.dialog.RemoveFileDialogFragment;
 import com.owncloud.android.ui.fragment.FileFragment;
@@ -579,6 +580,8 @@ public class PreviewMediaFragment extends FileFragment implements
                                     mMediaServiceConnection, 
                                     Context.BIND_AUTO_CREATE);
             // follow the flow in MediaServiceConnection#onServiceConnected(...)
+
+        ((FileDisplayActivity) getActivity()).setMediaServiceConnection();
     }
     
     /** Defines callbacks for service binding, passed to bindService() */
