@@ -97,82 +97,83 @@ public class UploadListFragment extends ExpandableListFragment {
         getListView().setOnCreateContextMenuListener(this);
     }
 
-    @Override
-    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-        boolean handled = false;
-        UploadDbObject uploadDbObject = (UploadDbObject) mAdapter.getChild(groupPosition, childPosition);
-        if (uploadDbObject != null) {
-            // notify the click to container Activity
-            handled = mContainerActivity.onUploadItemClick(uploadDbObject);
-        } else {
-            Log_OC.w(TAG, "Null object in ListAdapter!!");
-        }
-        return handled;
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.upload_actions_menu, menu);
-        
-        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) menuInfo;  
-        int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
-        int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
-        UploadDbObject uploadFile = (UploadDbObject) mAdapter.getChild(groupPosition, childPosition);
-        if (UploadUtils.userCanCancelUpload(uploadFile)) {
-            MenuItem item = menu.findItem(R.id.action_remove_upload);
-            if (item != null) {
-                item.setVisible(false);
-                item.setEnabled(false);
-            }
-        } else {
-            MenuItem item = menu.findItem(R.id.action_cancel_upload);
-            if (item != null) {
-                item.setVisible(false);
-                item.setEnabled(false);
-            }
-        }
-        if (!UploadUtils.userCanRetryUpload(uploadFile)) {
-            MenuItem item = menu.findItem(R.id.action_retry_upload);
-            if (item != null) {
-                item.setVisible(false);
-                item.setEnabled(false);
-            }
-        }
-    }
-    
-    @Override
-    public boolean onContextItemSelected (MenuItem item) {
-        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();  
-        int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
-        int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
-        UploadDbObject uploadFile = (UploadDbObject) mAdapter.getChild(groupPosition, childPosition);
-        switch (item.getItemId()) {
-        case R.id.action_cancel_upload:
-            ((FileActivity) getActivity()).getFileOperationsHelper().cancelTransference(uploadFile.getOCFile());
-            return true;
-        case R.id.action_remove_upload: {
-            ((FileActivity) getActivity()).getFileOperationsHelper().removeUploadFromList(uploadFile);
-            return true;
-        }case R.id.action_retry_upload: {
-            ((FileActivity) getActivity()).getFileOperationsHelper().retryUpload(uploadFile);
-            return true;
-        }case R.id.action_see_details: {
-            Intent showDetailsIntent = new Intent(getActivity(), FileDisplayActivity.class);
-            showDetailsIntent.putExtra(FileActivity.EXTRA_FILE, (Parcelable) uploadFile.getOCFile());
-            showDetailsIntent.putExtra(FileActivity.EXTRA_ACCOUNT, uploadFile.getAccount(getActivity()));
-            startActivity(showDetailsIntent);
-            return true;
-        }
-        case R.id.action_open_file_with: {
-            ((FileActivity) getActivity()).getFileOperationsHelper().openFile(uploadFile.getOCFile());
-            return true;
-        }
-        default:
-            return super.onContextItemSelected(item);
-        }
-    }
+    // TODO: Disable for testing only uploads view is shown
+//    @Override
+//    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//        boolean handled = false;
+//        UploadDbObject uploadDbObject = (UploadDbObject) mAdapter.getChild(groupPosition, childPosition);
+//        if (uploadDbObject != null) {
+//            // notify the click to container Activity
+//            handled = mContainerActivity.onUploadItemClick(uploadDbObject);
+//        } else {
+//            Log_OC.w(TAG, "Null object in ListAdapter!!");
+//        }
+//        return handled;
+//    }
+//
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+//        super.onCreateContextMenu(menu, v, menuInfo);
+//        MenuInflater inflater = getActivity().getMenuInflater();
+//        inflater.inflate(R.menu.upload_actions_menu, menu);
+//
+//        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) menuInfo;
+//        int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
+//        int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+//        UploadDbObject uploadFile = (UploadDbObject) mAdapter.getChild(groupPosition, childPosition);
+//        if (UploadUtils.userCanCancelUpload(uploadFile)) {
+//            MenuItem item = menu.findItem(R.id.action_remove_upload);
+//            if (item != null) {
+//                item.setVisible(false);
+//                item.setEnabled(false);
+//            }
+//        } else {
+//            MenuItem item = menu.findItem(R.id.action_cancel_upload);
+//            if (item != null) {
+//                item.setVisible(false);
+//                item.setEnabled(false);
+//            }
+//        }
+//        if (!UploadUtils.userCanRetryUpload(uploadFile)) {
+//            MenuItem item = menu.findItem(R.id.action_retry_upload);
+//            if (item != null) {
+//                item.setVisible(false);
+//                item.setEnabled(false);
+//            }
+//        }
+//    }
+//
+//    @Override
+//    public boolean onContextItemSelected (MenuItem item) {
+//        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
+//        int childPosition = ExpandableListView.getPackedPositionChild(info.packedPosition);
+//        int groupPosition = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+//        UploadDbObject uploadFile = (UploadDbObject) mAdapter.getChild(groupPosition, childPosition);
+//        switch (item.getItemId()) {
+//        case R.id.action_cancel_upload:
+//            ((FileActivity) getActivity()).getFileOperationsHelper().cancelTransference(uploadFile.getOCFile());
+//            return true;
+//        case R.id.action_remove_upload: {
+//            ((FileActivity) getActivity()).getFileOperationsHelper().removeUploadFromList(uploadFile);
+//            return true;
+//        }case R.id.action_retry_upload: {
+//            ((FileActivity) getActivity()).getFileOperationsHelper().retryUpload(uploadFile);
+//            return true;
+//        }case R.id.action_see_details: {
+//            Intent showDetailsIntent = new Intent(getActivity(), FileDisplayActivity.class);
+//            showDetailsIntent.putExtra(FileActivity.EXTRA_FILE, (Parcelable) uploadFile.getOCFile());
+//            showDetailsIntent.putExtra(FileActivity.EXTRA_ACCOUNT, uploadFile.getAccount(getActivity()));
+//            startActivity(showDetailsIntent);
+//            return true;
+//        }
+//        case R.id.action_open_file_with: {
+//            ((FileActivity) getActivity()).getFileOperationsHelper().openFile(uploadFile.getOCFile());
+//            return true;
+//        }
+//        default:
+//            return super.onContextItemSelected(item);
+//        }
+//    }
 
     /**
      * Interface to implement by any Activity that includes some instance of

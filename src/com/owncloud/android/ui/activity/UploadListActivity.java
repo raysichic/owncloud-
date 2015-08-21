@@ -129,38 +129,39 @@ public class UploadListActivity extends FileActivity implements UploadListFragme
         showDetailsIntent.putExtra(FileActivity.EXTRA_ACCOUNT, file.getAccount(this));
         startActivity(showDetailsIntent);
     }
-    
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        boolean retval = true;
-        switch (item.getItemId()) {
-            case R.id.action_retry_uploads: {
-                Log_OC.d(TAG, "FileUploadService.retry() called by onMenuItemSelected()");
-                FileUploadService.retry(this);
-                break;
-            }
-            case R.id.action_clear_failed_uploads: {
-                UploadDbHandler db = UploadDbHandler.getInstance(this);
-                db.clearFailedUploads();
-                break;
-            }
-            case R.id.action_clear_finished_uploads: {
-                UploadDbHandler db = UploadDbHandler.getInstance(this);
-                db.clearFinishedUploads();
-                break;
-            }
-            default:
-                retval = super.onOptionsItemSelected(item);
-        }
-        return retval;
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.upload_list_menu, menu);
-        return true;
-    }
+    // TODO: Disable menu, for testing only uploads view is shown
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        boolean retval = true;
+//        switch (item.getItemId()) {
+//            case R.id.action_retry_uploads: {
+//                Log_OC.d(TAG, "FileUploadService.retry() called by onMenuItemSelected()");
+//                FileUploadService.retry(this);
+//                break;
+//            }
+//            case R.id.action_clear_failed_uploads: {
+//                UploadDbHandler db = UploadDbHandler.getInstance(this);
+//                db.clearFailedUploads();
+//                break;
+//            }
+//            case R.id.action_clear_finished_uploads: {
+//                UploadDbHandler db = UploadDbHandler.getInstance(this);
+//                db.clearFinishedUploads();
+//                break;
+//            }
+//            default:
+//                retval = super.onOptionsItemSelected(item);
+//        }
+//        return retval;
+//    }
+//
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.upload_list_menu, menu);
+//        return true;
+//    }
     
     @Override
     protected ServiceConnection newTransferenceServiceConnection() {
