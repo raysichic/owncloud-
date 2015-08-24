@@ -30,7 +30,7 @@ import org.openqa.selenium.support.PageFactory;
 public class CertificatePopUp {
 	final AndroidDriver driver;	
 	
-	@AndroidFindBy(name = "OK")
+	@AndroidFindBy(name = "Yes")
 	private AndroidElement okButton;
 	
 	public CertificatePopUp (AndroidDriver driver) {

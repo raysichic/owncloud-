@@ -172,9 +172,7 @@ public class Common{
 	protected void assertIsInFilesView(FilesView filesView) 
 			throws InterruptedException {
 		Common.waitTillElementIsPresent(
-				filesView.getTitleTextElement(),30000);
-		assertTrue(waitForTextPresent("ownCloud",
-				filesView.getTitleTextElement()));
+				filesView.getUploadButton(),30000);
 		assertTrue(filesView.getUploadButton().isDisplayed());	
 	}
 

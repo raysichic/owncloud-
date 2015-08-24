@@ -53,7 +53,7 @@ public class SmokeTestSuite{
 	}
 
 	@Test
-	@Category({NoIgnoreTestCategory.class, SmokeTestCategory.class, InProgressCategory.class})
+	@Category({NoIgnoreTestCategory.class, SmokeTestCategory.class})
 	public void testSmokeTest () throws Exception {
 
 		//TODO. login and logout and then continue. 

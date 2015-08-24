@@ -59,11 +59,6 @@ public class FilesView {
 	@AndroidFindBy(id = "android:id/home")
 	private AndroidElement home;
 
-	@CacheLookup
-	@AndroidFindBy(uiAutomator = "new UiSelector()"
-			+ ".resourceId(\"android:id/action_bar_title\")")
-	private AndroidElement titleText;
-
 	@AndroidFindBy(id = "android:id/progress_circular")
 	private AndroidElement progressCircular;
 
@@ -73,7 +68,9 @@ public class FilesView {
 	private AndroidElement newFolderButton;
 
 	@CacheLookup
-	@AndroidFindBy(uiAutomator = "new UiSelector().description(\"Upload\")")
+	//@AndroidFindBy(uiAutomator = "new UiSelector().description(\"Upload\")")
+	@AndroidFindBy(uiAutomator = "new UiSelector()"
+			+ ".resourceId(\"com.owncloud.android:id/action_upload\")")
 	private AndroidElement uploadButton;
 
 	private AndroidElement waitAMomentText;
@@ -147,10 +144,6 @@ public class FilesView {
 		filesElementUploadFile.click();
 		UploadFilesView uploadFilesView = new UploadFilesView(driver);
 		return uploadFilesView;
-	}
-
-	public AndroidElement getTitleTextElement () {
-		return titleText;
 	}
 
 	public AndroidElement getUploadButton () {
