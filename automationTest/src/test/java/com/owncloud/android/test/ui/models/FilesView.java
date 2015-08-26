@@ -170,7 +170,8 @@ public class FilesView {
 
 
 	public void tapOnElement (String elementName) {
-		Actions.getElementInFilesView(elementName,driver).tap(1, 1);
+		Actions.getElementInFilesView(elementName,driver).click();
+		//Actions.getElementInFilesView(elementName,driver).tap(1, 1);
 	}
 
 
