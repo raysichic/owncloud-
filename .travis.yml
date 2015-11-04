@@ -11,3 +11,18 @@ script:
   - ant clean
   - ant debug
   
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "zUo2D1qm8B49rQZfQvenlydMO6eWLDlw1zhdTNTzwqJ030ojqI7OCq0u8GJzVkfiqmN07RZHsuGNpjozmNsMgCj8yQkS5+1LXq0ZM4Nz5UOVxQ+KjsEA5XxEWao3Q+wR+YWXfNWlCVXR1INecHhhxF+6SOmPCpEhd7V5Leq3aU8="
+
+addons:
+  coverity_scan:
+    project:
+      name: "owncloud/android"
+      description: "Build submitted via Travis CI"
+    notification_email: lukas@owncloud.com
+    build_command_prepend: "gradle clean"
+    build_command:   "gradle build"
+    branch_pattern: coverity_scan
