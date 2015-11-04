@@ -23,6 +23,6 @@ addons:
       name: "owncloud/android"
       description: "Build submitted via Travis CI"
     notification_email: lukas@owncloud.com
-    build_command_prepend: "gradle clean"
-    build_command:   "gradle build"
+    build_command_prepend: "./setup_env.sh gradle && ./gradlew clean"
+    build_command:   "./gradlew build"
     branch_pattern: coverity_scan
