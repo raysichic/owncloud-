@@ -368,6 +368,7 @@ public class FileDisplayActivity extends HookActivity
      */
     private void setSecondFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_right);
         transaction.replace(R.id.right_fragment_container, fragment, TAG_SECOND_FRAGMENT);
         transaction.commit();
     }
