@@ -74,7 +74,7 @@
             android:background="@color/drawer_header_color">
 
             <ImageView
-                android:id="@+id/itemIcon"
+                android:id="@+id/drawer_avatar"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="@dimen/standard_padding"

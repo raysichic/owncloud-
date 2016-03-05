@@ -32,6 +32,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -45,6 +46,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -57,6 +59,7 @@ import com.owncloud.android.authentication.AccountUtils;
 import com.owncloud.android.authentication.AuthenticatorActivity;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
+import com.owncloud.android.datamodel.ThumbnailsCacheManager;
 import com.owncloud.android.files.FileOperationsHelper;
 import com.owncloud.android.files.services.FileDownloader;
 import com.owncloud.android.files.services.FileDownloader.FileDownloaderBinder;
@@ -378,6 +381,11 @@ public class FileActivity extends AppCompatActivity
         // Display username in drawer
         setUsernameInDrawer(navigationDrawerLayout, AccountUtils.getCurrentOwnCloudAccount(getApplicationContext()));
 
+        // Display avatar in drawer
+        if (mStorageManager != null) {
+            setAvatarInDrawer(navigationDrawerLayout, AccountUtils.getCurrentOwnCloudAccount(getApplicationContext()));
+        }
+
         // load slide menu items
         mDrawerTitles = getResources().getStringArray(R.array.drawer_items);
 
@@ -460,6 +468,46 @@ public class FileActivity extends AppCompatActivity
             TextView username = (TextView) navigationDrawerLayout.findViewById(R.id.drawer_username);
             int lastAtPos = account.name.lastIndexOf("@");
             username.setText(account.name.substring(0, lastAtPos));
+        }
+    }
+
+    /**
+     * sets the avatar of the current account in the drawer in case the drawer is available.
+     *
+     * @param navigationDrawerLayout the drawer layout to be used
+     * @param account                the account to be set in the drawer
+     */
+    protected void setAvatarInDrawer(RelativeLayout navigationDrawerLayout, Account account) {
+        if (navigationDrawerLayout != null && account != null) {
+            ImageView avatarView = (ImageView) navigationDrawerLayout.findViewById(R.id.drawer_avatar);
+            int lastAtPos = account.name.lastIndexOf("@");
+            String username = account.name.substring(0, lastAtPos);
+
+            // Thumbnail in Cache?
+            Bitmap thumbnail = ThumbnailsCacheManager.getBitmapFromDiskCache("a_" + username);
+
+            if (thumbnail != null){
+                avatarView.setImageBitmap(thumbnail);
+            } else {
+                // generate new avatar
+                if (ThumbnailsCacheManager.cancelPotentialAvatarWork(username, avatarView)) {
+                    final ThumbnailsCacheManager.AvatarGenerationTask task =
+                            new ThumbnailsCacheManager.AvatarGenerationTask(
+                                    avatarView, mStorageManager, mAccount
+                            );
+                    if (thumbnail == null) {
+                        thumbnail = ThumbnailsCacheManager.mDefaultImg;
+                    }
+                    final ThumbnailsCacheManager.AsyncAvatarDrawable asyncDrawable =
+                            new ThumbnailsCacheManager.AsyncAvatarDrawable(
+                                    getResources(),
+                                    thumbnail,
+                                    task
+                            );
+                    avatarView.setImageDrawable(asyncDrawable);
+                    task.execute(username);
+                }
+            }
         }
     }
 

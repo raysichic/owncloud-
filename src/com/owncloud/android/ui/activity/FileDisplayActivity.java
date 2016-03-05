@@ -310,6 +310,7 @@ public class FileDisplayActivity extends HookActivity implements
 
             if (mAccountWasSet) {
                 setUsernameInDrawer(findViewById(R.id.left_drawer), getAccount());
+                setAvatarInDrawer((RelativeLayout) findViewById(R.id.left_drawer), getAccount());
             }
 
             if (!stateWasRecovered) {
