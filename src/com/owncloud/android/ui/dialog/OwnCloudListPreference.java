@@ -52,16 +52,18 @@ public class OwnCloudListPreference extends ListPreference {
 
         // same thing happens for the Standard ListPreference though
         android.support.v7.app.AlertDialog.Builder builder =
-                new android.support.v7.app.AlertDialog.Builder(mContext, R.style.ownCloud_AlertDialog)
+            new android.support.v7.app.AlertDialog.Builder(mContext, R.style.ownCloud_AlertDialog)
                 .setTitle(getDialogTitle())
                 .setIcon(getDialogIcon())
-                .setSingleChoiceItems(getEntries(), preselect, this);
+                .setSingleChoiceItems(getEntries(), preselect, this)
+            ;
 
         PreferenceManager pm = getPreferenceManager();
         try {
             Method method = pm.getClass().getDeclaredMethod(
                     "registerOnActivityDestroyListener",
-                    PreferenceManager.OnActivityDestroyListener.class);
+                    PreferenceManager.OnActivityDestroyListener.class
+            );
             method.setAccessible(true);
             method.invoke(pm, this);
         } catch (Exception e) {

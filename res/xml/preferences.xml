@@ -59,6 +59,12 @@
             android:key="instant_upload_source_path"
             />
         <com.owncloud.android.ui.dialog.OwnCloudListPreference
+            android:key="instant_upload_account_name"
+            android:dialogTitle="@string/prefs_instant_account_dialog_title"
+            android:title="@string/prefs_instant_account_title"
+            android:summary="%s"
+            />
+        <com.owncloud.android.ui.dialog.OwnCloudListPreference
             android:key="prefs_instant_behaviour"
             android:dialogTitle="@string/prefs_instant_behaviour_dialogTitle"
             android:title="@string/prefs_instant_behaviour_title"

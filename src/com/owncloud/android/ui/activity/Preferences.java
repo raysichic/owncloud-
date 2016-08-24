@@ -81,6 +81,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.services.OperationsService;
 import com.owncloud.android.services.observer.FileObserverService;
 import com.owncloud.android.ui.RadioButtonPreference;
+import com.owncloud.android.ui.dialog.OwnCloudListPreference;
 import com.owncloud.android.utils.DisplayUtils;
 
 import java.io.File;
@@ -116,6 +117,7 @@ public class Preferences extends PreferenceActivity
     private String mUploadPath;
     private String mUploadVideoPath;
     private String mSourcePath;
+    private String mUploadAccountName;
 
     private PreferenceCategory mPrefInstantUploadCategory;
     private Preference mPrefInstantUpload;
@@ -124,6 +126,7 @@ public class Preferences extends PreferenceActivity
     private Preference mPrefInstantVideoUpload;
     private Preference mPrefInstantVideoUploadPath;
     private Preference mPrefInstantVideoUploadWiFi;
+    private Preference mPrefInstantUploadAccountName;
     private Preference mPrefInstantUploadSourcePath;
     private Preference mPrefInstantUploadBehaviour;
 
@@ -457,30 +460,46 @@ public class Preferences extends PreferenceActivity
             }
         });
 
-        mPrefInstantUploadSourcePath =  findPreference("instant_upload_source_path");
-        if (mPrefInstantUploadSourcePath != null) {
-            mPrefInstantUploadSourcePath.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        mPrefInstantUploadAccountName = findPreference("instant_upload_account_name");
+        /*mPrefInstantUploadAccountName.setOnPreferenceChangeListener(
+            new OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    if (!mSourcePath.endsWith(File.separator)) {
-                        mSourcePath += File.separator;
-                    }
-                    LocalFolderPickerActivity.startLocalFolderPickerActivityForResult(
-                        Preferences.this,
-                        mSourcePath,
-                        ACTION_SELECT_SOURCE_PATH
-                    );
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    preference.setSummary((String)newValue);
                     return true;
                 }
-            });
+            }
+        );*/
+
+        mPrefInstantUploadSourcePath =  findPreference("instant_upload_source_path");
+        if (mPrefInstantUploadSourcePath != null) {
+            mPrefInstantUploadSourcePath.setOnPreferenceClickListener(
+                new OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        if (!mSourcePath.endsWith(File.separator)) {
+                            mSourcePath += File.separator;
+                        }
+                        LocalFolderPickerActivity.startLocalFolderPickerActivityForResult(
+                            Preferences.this,
+                            mSourcePath,
+                            ACTION_SELECT_SOURCE_PATH
+                        );
+                        return true;
+                    }
+                }
+            );
         } else {
             Log_OC.e(TAG, "Lost preference instant_upload_source_path");
         }
 
         mPrefInstantUploadBehaviour = findPreference("prefs_instant_behaviour");
+
         toggleInstantUploadCommonOptions(
-                ((CheckBoxPreference)mPrefInstantVideoUpload).isChecked(),
-                ((CheckBoxPreference)mPrefInstantUpload).isChecked());
+            ((CheckBoxPreference)mPrefInstantVideoUpload).isChecked(),
+            ((CheckBoxPreference)mPrefInstantUpload).isChecked()
+        );
+
 
         /* About App */
         pAboutApp = (Preference) findPreference("about_app");
@@ -530,9 +549,12 @@ public class Preferences extends PreferenceActivity
 
     private void toggleInstantUploadCommonOptions(Boolean video, Boolean picture){
         if (picture || video){
+            loadInstantUploadAccount(); // with every toggle, list of account may change out of ownCloud app
+            mPrefInstantUploadCategory.addPreference(mPrefInstantUploadAccountName);
             mPrefInstantUploadCategory.addPreference(mPrefInstantUploadSourcePath);
             mPrefInstantUploadCategory.addPreference(mPrefInstantUploadBehaviour);
         } else {
+            mPrefInstantUploadCategory.removePreference(mPrefInstantUploadAccountName);
             mPrefInstantUploadCategory.removePreference(mPrefInstantUploadSourcePath);
             mPrefInstantUploadCategory.removePreference(mPrefInstantUploadBehaviour);
         }
@@ -777,7 +799,7 @@ public class Preferences extends PreferenceActivity
         Account accounts[] = am.getAccountsByType(MainApp.getAccountType());
         Account currentAccount = AccountUtils.getCurrentOwnCloudAccount(getApplicationContext());
 
-        if (am.getAccountsByType(MainApp.getAccountType()).length == 0) {
+        if (accounts.length == 0) {
             // Show create account screen if there isn't any account
             am.addAccount(MainApp.getAccountType(), null, null, null, this,
                     null,
@@ -952,7 +974,7 @@ public class Preferences extends PreferenceActivity
     }
 
     /**
-     * Save the "Instant Video Upload Path" on preferences
+     * Save the "Instant Upload Source Path" on preferences
      */
     private void saveInstantUploadSourcePathOnPreferences() {
         SharedPreferences appPrefs =
@@ -960,6 +982,83 @@ public class Preferences extends PreferenceActivity
         SharedPreferences.Editor editor = appPrefs.edit();
         editor.putString("instant_upload_source_path", mSourcePath);
         editor.commit();
+    }
+
+    /**
+     * Loads both the currently selected account to save instant uploads, and the list of entries and values
+     * to show in the preference list to select a different value.
+     */
+    private void loadInstantUploadAccount() {
+        OwnCloudListPreference prefInstantUploadAccountName =
+            (OwnCloudListPreference) mPrefInstantUploadAccountName;
+
+        AccountManager am = (AccountManager) getSystemService(ACCOUNT_SERVICE);
+        Account accounts[] = am.getAccountsByType(MainApp.getAccountType());
+
+        if (accounts.length == 0) {
+            // no account
+            prefInstantUploadAccountName.setSummary("");
+            prefInstantUploadAccountName.setEnabled(false);
+
+        } else {
+            /// read current value stored in prefs
+            SharedPreferences appPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            mUploadAccountName = appPrefs.getString("instant_upload_account_name", null);
+            String currentAccountName = AccountUtils.getCurrentOwnCloudAccount(
+                getApplicationContext()
+            ).name;
+            if (mUploadAccountName == null) {
+                mUploadAccountName = currentAccountName; // default
+            }
+
+            /// build list of values and shown entries for list
+            CharSequence[] entries = new CharSequence[accounts.length];
+            CharSequence[] entryValues = new CharSequence[accounts.length];
+
+            OwnCloudAccount oca;
+            Account account;
+            int currentValueIndex = -1;
+            int currentAccountIndex = -1;
+            for (int i = 0; i < accounts.length; i++) {
+                account = accounts[i];
+                entryValues[i] = account.name;      // account names are values
+                if (mUploadAccountName.equals(account.name)) {
+                    currentValueIndex = i;
+                }
+                if (currentAccountName.equals(account.name)) {
+                    currentAccountIndex = i;
+                }
+                try {
+                    oca = new OwnCloudAccount(account, this);
+                    entries[i] =
+                        oca.getDisplayName() + " @ " +
+                            DisplayUtils.convertIdn(
+                                account.name.substring(account.name.lastIndexOf("@") + 1),
+                                false
+                            )
+                    ;
+                } catch (Exception e) {
+                    Log_OC.w(
+                        TAG,
+                        "Account not found right after being read; using account name instead of display name"
+                    );
+                    entries[i] = DisplayUtils.convertIdn(account.name, false);
+                }
+            }
+
+            prefInstantUploadAccountName.setEntries(entries);
+            prefInstantUploadAccountName.setEntryValues(entryValues);
+
+            /// set currently selected entry
+            if (currentValueIndex == -1) {
+                // stored upload account does not exist in AccountManager anymore -> default to current
+                currentValueIndex = currentAccountIndex;
+                mUploadAccountName = currentAccountName;
+            }
+            //prefInstantUploadAccountName.setSummary(entryValues[currentValueIndex]);
+            prefInstantUploadAccountName.setValueIndex(currentValueIndex);
+        }
     }
 
     // Methods for ComponetsGetter
