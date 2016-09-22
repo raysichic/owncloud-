@@ -85,7 +85,7 @@ public abstract class PreferenceManager {
         result.setWifiOnlyForVideos(
             prefs.getBoolean(PREF__INSTANT_VIDEO_WIFI_ONLY, false)
         );
-        Account currentAccount = AccountUtils.getCurrentOwnCloudAccount(context);
+        Account currentAccount = FileStorageUtils.getInstantUploadAccount(context);
         result.setUploadAccountName(
             prefs.getString(
                 PREF__INSTANT_UPLOAD_ACCOUNT_NAME,

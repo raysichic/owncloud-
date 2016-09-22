@@ -114,8 +114,10 @@ public class Preferences extends PreferenceActivity
     private boolean mShowContextMenu = false;
 
     private String mUploadPath;
-    private String mUploadVideoPath;
+
     private String mSourcePath;
+
+    private String mUploadPathAccount;
 
     private PreferenceCategory mPrefInstantUploadCategory;
     private Preference mPrefInstantUpload;
@@ -126,6 +128,10 @@ public class Preferences extends PreferenceActivity
     private Preference mPrefInstantVideoUploadWiFi;
     private Preference mPrefInstantUploadSourcePath;
     private Preference mPrefInstantUploadBehaviour;
+
+    private Preference mPrefInstantVideoUploadPathWiFi;
+    private String mUploadVideoPath;
+    private String mUploadVideoPathAccount;
 
     protected FileDownloader.FileDownloaderBinder mDownloaderBinder = null;
     protected FileUploader.FileUploaderBinder mUploaderBinder = null;
@@ -198,7 +204,7 @@ public class Preferences extends PreferenceActivity
                                                 AuthenticatorActivity.ACTION_UPDATE_TOKEN);
                                         startActivity(updateAccountCredentials);
                                         alertDialog.cancel();
-                                        
+
                                     } else if (position==1) {
 
                                         // Remove account
@@ -218,7 +224,7 @@ public class Preferences extends PreferenceActivity
                 return false;
             }
         });
-        
+
         // Load package info
         String temp;
         try {
@@ -227,9 +233,9 @@ public class Preferences extends PreferenceActivity
         } catch (NameNotFoundException e) {
             temp = "";
             Log_OC.e(TAG, "Error while showing about dialog", e);
-        } 
+        }
         final String appVersion = temp;
-       
+
         // Register context menu for list of preferences.
         registerForContextMenu(getListView());
 
@@ -253,13 +259,13 @@ public class Preferences extends PreferenceActivity
                     return false;
                 }
             });
-            
+
         }
 
 
 
         PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference("more");
-        
+
         boolean helpEnabled = getResources().getBoolean(R.bool.help_enabled);
         Preference pHelp =  findPreference("help");
         if (pHelp != null ){
@@ -279,9 +285,9 @@ public class Preferences extends PreferenceActivity
             } else {
                 preferenceCategory.removePreference(pHelp);
             }
-            
+
         }
-        
+
        boolean recommendEnabled = getResources().getBoolean(R.bool.recommend_enabled);
        Preference pRecommend =  findPreference("recommend");
         if (pRecommend != null){
@@ -290,11 +296,11 @@ public class Preferences extends PreferenceActivity
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
 
-                        Intent intent = new Intent(Intent.ACTION_SENDTO); 
+                        Intent intent = new Intent(Intent.ACTION_SENDTO);
                         intent.setType("text/plain");
-                        intent.setData(Uri.parse(getString(R.string.mail_recommend))); 
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-                        
+                        intent.setData(Uri.parse(getString(R.string.mail_recommend)));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
                         String appName = getString(R.string.app_name);
                         String downloadUrl = getString(R.string.url_app_download);
 
@@ -303,7 +309,7 @@ public class Preferences extends PreferenceActivity
                                 appName);
                         String recommendText = String.format(getString(R.string.recommend_text),
                                 appName, downloadUrl);
-                        
+
                         intent.putExtra(Intent.EXTRA_SUBJECT, recommendSubject);
                         intent.putExtra(Intent.EXTRA_TEXT, recommendText);
                         startActivity(intent);
@@ -315,9 +321,9 @@ public class Preferences extends PreferenceActivity
             } else {
                 preferenceCategory.removePreference(pRecommend);
             }
-            
+
         }
-        
+
         boolean feedbackEnabled = getResources().getBoolean(R.bool.feedback_enabled);
         Preference pFeedback =  findPreference("feedback");
         if (pFeedback != null){
@@ -328,14 +334,14 @@ public class Preferences extends PreferenceActivity
                         String feedbackMail   =(String) getText(R.string.mail_feedback);
                         String feedback   =(String) getText(R.string.prefs_feedback) +
                                 " - android v" + appVersion;
-                        Intent intent = new Intent(Intent.ACTION_SENDTO); 
+                        Intent intent = new Intent(Intent.ACTION_SENDTO);
                         intent.setType("text/plain");
                         intent.putExtra(Intent.EXTRA_SUBJECT, feedback);
-                        
-                        intent.setData(Uri.parse(feedbackMail)); 
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+
+                        intent.setData(Uri.parse(feedbackMail));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
-                        
+
                         return true;
                     }
                 });
@@ -403,14 +409,14 @@ public class Preferences extends PreferenceActivity
 
         mPrefInstantUploadCategory =
                 (PreferenceCategory) findPreference("instant_uploading_category");
-        
+
         mPrefInstantUploadWiFi =  findPreference("instant_upload_on_wifi");
         mPrefInstantUpload = findPreference("instant_uploading");
-        
+
         toggleInstantPictureOptions(((CheckBoxPreference) mPrefInstantUpload).isChecked());
-        
+
         mPrefInstantUpload.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-            
+
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 boolean enableInstantPicture = (Boolean) newValue;
@@ -422,7 +428,7 @@ public class Preferences extends PreferenceActivity
                 return true;
             }
         });
-       
+
         mPrefInstantVideoUploadPath =  findPreference("instant_video_upload_path");
         if (mPrefInstantVideoUploadPath != null){
 
@@ -440,11 +446,11 @@ public class Preferences extends PreferenceActivity
                     }
                 });
         }
-        
+
         mPrefInstantVideoUploadWiFi =  findPreference("instant_video_upload_on_wifi");
         mPrefInstantVideoUpload = findPreference("instant_video_uploading");
         toggleInstantVideoOptions(((CheckBoxPreference) mPrefInstantVideoUpload).isChecked());
-        
+
         mPrefInstantVideoUpload.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
             @Override
@@ -507,7 +513,7 @@ public class Preferences extends PreferenceActivity
         }
 
     }
-    
+
     private void toggleInstantPictureOptions(Boolean value){
         if (value){
             mPrefInstantUploadCategory.addPreference(mPrefInstantUploadWiFi);
@@ -517,7 +523,7 @@ public class Preferences extends PreferenceActivity
             mPrefInstantUploadCategory.removePreference(mPrefInstantUploadPath);
         }
     }
-    
+
     private void toggleInstantVideoOptions(Boolean value){
         if (value){
             mPrefInstantUploadCategory.addPreference(mPrefInstantVideoUploadWiFi);
@@ -621,10 +627,14 @@ public class Preferences extends PreferenceActivity
         if (requestCode == ACTION_SELECT_UPLOAD_PATH && resultCode == RESULT_OK) {
 
             OCFile folderToUpload = data.getParcelableExtra(UploadPathActivity.EXTRA_FOLDER);
-            mUploadPath = folderToUpload.getRemotePath();
-            mPrefInstantUploadPath.setSummary(
-                DisplayUtils.getPathWithoutLastSlash(mUploadPath)
-            );
+
+            mUploadPath = DisplayUtils.getPathWithoutLastSlash(mUploadPath);
+
+            mUploadPathAccount = AccountUtils.getCurrentOwnCloudAccount(MainApp.getAppContext()).name;
+
+            // Show the path on summary preference
+            mPrefInstantUploadPath.setSummary(getUploadAccountPath(mUploadPathAccount, mUploadPath));
+
             saveInstantUploadPathOnPreferences();
 
         } else if (requestCode == ACTION_SELECT_UPLOAD_VIDEO_PATH && resultCode == RESULT_OK) {
@@ -638,10 +648,11 @@ public class Preferences extends PreferenceActivity
 
         } else if (requestCode == ACTION_SELECT_SOURCE_PATH && resultCode == RESULT_OK) {
 
-            mSourcePath = data.getStringExtra(LocalFolderPickerActivity.EXTRA_PATH);
-            mPrefInstantUploadSourcePath.setSummary(
-                DisplayUtils.getPathWithoutLastSlash(mSourcePath)
-            );
+            mUploadVideoPathAccount = AccountUtils.getCurrentOwnCloudAccount(MainApp.getAppContext()).name;
+
+            // Show the video path on summary preference
+            mPrefInstantVideoUploadPath.setSummary(getUploadAccountPath(mUploadVideoPathAccount, mUploadVideoPath));
+
             saveInstantUploadSourcePathOnPreferences();
 
         } else if (requestCode == ACTION_REQUEST_PASSCODE && resultCode == RESULT_OK) {
@@ -821,7 +832,7 @@ public class Preferences extends PreferenceActivity
                             RadioButtonPreference p =
                                     (RadioButtonPreference) findPreference(a.name);
                             if (key.equals(a.name)) {
-                                boolean accountChanged = !p.isChecked(); 
+                                boolean accountChanged = !p.isChecked();
                                 p.setChecked(true);
                                 AccountUtils.setCurrentOwnCloudAccount(
                                         getApplicationContext(),
@@ -830,7 +841,7 @@ public class Preferences extends PreferenceActivity
                                 if (accountChanged) {
                                     // restart the main activity
                                     Intent i = new Intent(
-                                            Preferences.this, 
+                                            Preferences.this,
                                             FileDisplayActivity.class
                                     );
                                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -880,25 +891,34 @@ public class Preferences extends PreferenceActivity
     }
 
     /**
+     * Returns a combined string of accountName and uploadPath to be displayed to user.
+     */
+    private String getUploadAccountPath(String accountName, String uploadPath) {
+        return accountName + ":" + uploadPath;
+    }
+
+    /**
      * Load upload path set on preferences
      */
     private void loadInstantUploadPath() {
         SharedPreferences appPrefs =
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mUploadPath = appPrefs.getString("instant_upload_path", getString(R.string.instant_upload_path));
-        mPrefInstantUploadPath.setSummary(
-            DisplayUtils.getPathWithoutLastSlash(mUploadPath)
-        );
+
+        mUploadPathAccount = appPrefs.getString("instant_upload_path_account",
+                AccountUtils.getCurrentOwnCloudAccount(MainApp.getAppContext()).name);
+        mPrefInstantUploadPath.setSummary(getUploadAccountPath(mUploadPathAccount, mUploadPath));
     }
 
     /**
-     * Save the "Instant Upload Path" on preferences
+     * Save the "Instant Upload Path" and corresponding account on preferences
      */
     private void saveInstantUploadPathOnPreferences() {
         SharedPreferences appPrefs =
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = appPrefs.edit();
         editor.putString("instant_upload_path", mUploadPath);
+        editor.putString("instant_upload_path_account", mUploadPathAccount);
         editor.commit();
     }
 
@@ -909,19 +929,20 @@ public class Preferences extends PreferenceActivity
         SharedPreferences appPrefs =
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mUploadVideoPath = appPrefs.getString("instant_video_upload_path", getString(R.string.instant_upload_path));
-        mPrefInstantVideoUploadPath.setSummary(
-            DisplayUtils.getPathWithoutLastSlash(mUploadVideoPath)
-        );
+        mUploadVideoPathAccount = appPrefs.getString("instant_video_upload_path_account",
+                AccountUtils.getCurrentOwnCloudAccount(MainApp.getAppContext()).name);
+        mPrefInstantVideoUploadPath.setSummary(getUploadAccountPath(mUploadVideoPathAccount, mUploadVideoPath));
     }
 
     /**
-     * Save the "Instant Video Upload Path" on preferences
+     * Save the "Instant Video Upload Path" and corresponding account on preferences
      */
     private void saveInstantUploadVideoPathOnPreferences() {
         SharedPreferences appPrefs =
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = appPrefs.edit();
         editor.putString("instant_video_upload_path", mUploadVideoPath);
+        editor.putString("instant_video_upload_path_account", mUploadVideoPathAccount);
         editor.commit();
     }
 
